@@ -117,3 +117,31 @@ advtrains.register_wagon("rocket_wagon_box", {
 	},
 }, S("Rocket Box Wagon"), "advtrains_wagon_rocket_box_inv.png")
 
+
+minetest.register_craft({
+	output = 'advtrains:rocket',
+	recipe = {
+		{'advtrains:chimney', '', ''},
+		{'advtrains:chimney', 'advtrains:boiler', 'default:wood'},
+		{'advtrains:wheel', '', 'advtrains:wheel'},
+	},
+})
+
+minetest.register_craft({
+	output = 'advtrains:rocket_wagon_tender',
+	recipe = {
+		{'', '', 'default:chest'},
+		{'default:wood', 'default:wood', 'default:wood'},
+		{'advtrains:wheel', '', 'advtrains:wheel'},
+	},
+})
+
+minetest.register_craft({
+	output = 'advtrains:rocket_wagon_tender',
+	recipe = {
+		{'default:chest', 'default:chest', 'default:chest'},
+		{'default:wood', 'default:wood', 'default:wood'},
+		{'advtrains:wheel', '', 'advtrains:wheel'},
+	},
+})
+
