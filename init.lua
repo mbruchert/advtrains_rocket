@@ -1,5 +1,5 @@
 local S
-if minetest.get_modpath("intllib") then
+if core.get_modpath("intllib") then
     S = intllib.Getter()
 else
     S = function(s,a,...)a={a,...}return s:gsub("@(%d+)",function(n)return a[tonumber(n)]end)end
@@ -37,7 +37,7 @@ advtrains.register_wagon("rocket", {
 		end
 	end,
 	custom_on_activate = function(self, staticdata_table, dtime_s)
-		minetest.add_particlespawner({
+		core.add_particlespawner({
 			amount = 20,
 			time = 0,
 		--  ^ If time is 0 has infinite lifespan and spawns the amount on a per-second base
@@ -118,30 +118,169 @@ advtrains.register_wagon("rocket_wagon_box", {
 }, S("Rocket Box Wagon"), "advtrains_wagon_rocket_box_inv.png")
 
 
-minetest.register_craft({
+--craftings for train
+
+core.register_craft({
 	output = 'advtrains:rocket',
 	recipe = {
 		{'advtrains:chimney', '', ''},
-		{'advtrains:chimney', 'advtrains:boiler', 'default:wood'},
+		{'advtrains:chimney', 'advtrains:boiler', 'group:wood'},
 		{'advtrains:wheel', '', 'advtrains:wheel'},
 	},
 })
 
-minetest.register_craft({
+core.register_craft({
 	output = 'advtrains:rocket_wagon_tender',
 	recipe = {
-		{'', '', 'default:chest'},
-		{'default:wood', 'default:wood', 'default:wood'},
+		{'', '', 'advtrains_train_rocket:barrel'},
+		{'group:wood', 'group:wood', 'group:wood'},
 		{'advtrains:wheel', '', 'advtrains:wheel'},
 	},
 })
 
-minetest.register_craft({
+core.register_craft({
 	output = 'advtrains:rocket_wagon_tender',
 	recipe = {
-		{'default:chest', 'default:chest', 'default:chest'},
-		{'default:wood', 'default:wood', 'default:wood'},
+		{'advtrains_train_rocket:barrel_stack', 'advtrains_train_rocket:barrel_stack', 'advtrains_train_rocket:barrel_stack'},
+		{'group:wood', 'group:wood', 'group:wood'},
 		{'advtrains:wheel', '', 'advtrains:wheel'},
 	},
 })
 
+--barrels for craftings and decoration
+
+local barrel_formspec =
+	"size[8,9]" ..
+	default.gui_bg ..
+	default.gui_bg_img ..
+	default.gui_slots ..
+	"list[current_name;main;0,0.3;8,4;]" ..
+	"list[current_player;main;0,4.85;8,1;]" ..
+	"list[current_player;main;0,6.08;8,3;8]" ..
+	"listring[current_name;main]" ..
+	"listring[current_player;main]" ..
+	default.get_hotbar_bg(0,4.85)
+
+core.register_node("advtrains_train_rocket:barrel", {
+	description = "barrel",
+	tiles = {"advtrains_rocket_wagon.png"},
+	groups = {choppy = 3, oddly_breakable_by_hand = 3, flammable = 3,},
+	drawtype = "mesh",
+    paramtype2 = "facedir",
+	mesh = "advtrains_barrel.b3d",
+    visual_scale = 0.4,
+	paramtype = "light",
+    sounds = default.node_sound_wood_defaults(),
+          
+    on_construct = function(pos)
+		local meta = core.get_meta(pos)
+		meta:set_string("formspec", barrel_formspec)
+		local inv = meta:get_inventory()
+		inv:set_size("main", 8*1)
+	end,
+	can_dig = function(pos,player)
+		local meta = core.get_meta(pos);
+		local inv = meta:get_inventory()
+		return inv:is_empty("main")
+	end,
+	on_metadata_inventory_move = function(pos, from_list, from_index,
+			to_list, to_index, count, player)
+		core.log("action", player:get_player_name() ..
+			" moves stuff in chest at " .. core.pos_to_string(pos))
+	end,
+    on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		core.log("action", player:get_player_name() ..
+			" moves " .. stack:get_name() ..
+			" to chest at " .. core.pos_to_string(pos))
+	end,
+    on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		core.log("action", player:get_player_name() ..
+			" takes " .. stack:get_name() ..
+			" from chest at " .. core.pos_to_string(pos))
+	end,
+	on_blast = function(pos)
+		local drops = {}
+		default.get_inventory_drops(pos, "main", drops)
+		drops[#drops+1] = "advtrains_train_rocket:barrel"
+		core.remove_node(pos)
+		return drops
+	end,
+})
+
+core.register_node("advtrains_train_rocket:barrel_stack", {
+	description = "stacked barrel",
+	tiles = {"advtrains_rocket_wagon.png"},
+	groups = {choppy = 3, oddly_breakable_by_hand = 3, flammable = 3,},
+	drawtype = "mesh",
+    paramtype2 = "facedir",
+	mesh = "advtrains_barrel_stack.b3d",
+    visual_scale = 0.4,
+	paramtype = "light",
+    sounds = default.node_sound_wood_defaults(),
+    selection_box = {
+		type = "fixed",
+		fixed = {
+				{-1.5, -0.5, -0.5, 0.5, 1.25, 0.5},
+        },
+    },
+    collision_box = {
+		type = "fixed",
+		fixed = {
+				{-1.5, -0.5, -0.5, 0.5, 1.25, 0.5},
+        },
+    },
+          
+    on_construct = function(pos)
+		local meta = core.get_meta(pos)
+		meta:set_string("formspec", barrel_formspec)
+		local inv = meta:get_inventory()
+		inv:set_size("main", 8*3)
+	end,
+	can_dig = function(pos,player)
+		local meta = core.get_meta(pos);
+		local inv = meta:get_inventory()
+		return inv:is_empty("main")
+	end,
+	on_metadata_inventory_move = function(pos, from_list, from_index,
+			to_list, to_index, count, player)
+		core.log("action", player:get_player_name() ..
+			" moves stuff in chest at " .. core.pos_to_string(pos))
+	end,
+    on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		core.log("action", player:get_player_name() ..
+			" moves " .. stack:get_name() ..
+			" to chest at " .. core.pos_to_string(pos))
+	end,
+    on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		core.log("action", player:get_player_name() ..
+			" takes " .. stack:get_name() ..
+			" from chest at " .. core.pos_to_string(pos))
+	end,
+	on_blast = function(pos)
+		local drops = {}
+		default.get_inventory_drops(pos, "main", drops)
+		drops[#drops+1] = "advtrains_train_rocket:barrel_stack"
+		core.remove_node(pos)
+		return drops
+	end,
+})
+
+--craftings for barrels
+core.register_craft({
+	output = 'advtrains_train_rocket:barrel',
+	recipe = {
+		{'group:wood', 'group:wood', 'group:wood'},
+		{'default:steel_ingot','','default:steel_ingot'},
+		{'group:wood', 'group:wood', 'group:wood'},
+	},
+})
+core.register_craft({
+	output = 'advtrains_train_rocket:barrel_stack',
+	recipe = {
+		{'', 'advtrains_train_rocket:barrel', ''},
+		{'group:stick', 'group:stick', 'group:stick'},
+		{'advtrains_train_rocket:barrel', '', 'advtrains_train_rocket:barrel'},
+	},
+})
+
+    
