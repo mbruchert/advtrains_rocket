@@ -220,7 +220,7 @@ core.register_node("advtrains_train_rocket:barrel_stack", {
     selection_box = {
 		type = "fixed",
 		fixed = {
-				{-1.5, -0.5, -0.5, 0.5, 1.25, 0.5},
+				{-1.0, -0.5, -0.5, 1.0, 1.25, 0.5},
         },
     },
     collision_box = {
