@@ -29,7 +29,7 @@ advtrains.register_wagon("rocket", {
 	assign_to_seat_group = {"dstand"},
 	visual_size = {x=1, y=1},
 	wagon_span=1.6,
-	collisionbox = {-1.0,-0.5,-1.0, 1.0,3.5,1.0},
+	collisionbox = {-1.0,-0.5,-1.0, 1.0,2.5,1.0},
 	update_animation=function(self, velocity)
 		if self.old_anim_velocity~=advtrains.abs_ceil(velocity) then
 			self.object:set_animation({x=1,y=80}, advtrains.abs_ceil(velocity)*15, 0, true)
