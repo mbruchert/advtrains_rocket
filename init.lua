@@ -1,5 +1,5 @@
 local S
-if core.get_modpath("intllib") then
+if minetest.get_modpath("intllib") then
     S = intllib.Getter()
 else
     S = function(s,a,...)a={a,...}return s:gsub("@(%d+)",function(n)return a[tonumber(n)]end)end
@@ -37,7 +37,7 @@ advtrains.register_wagon("rocket", {
 		end
 	end,
 	custom_on_activate = function(self, staticdata_table, dtime_s)
-		core.add_particlespawner({
+		minetest.add_particlespawner({
 			amount = 20,
 			time = 0,
 		--  ^ If time is 0 has infinite lifespan and spawns the amount on a per-second base
@@ -82,12 +82,7 @@ advtrains.register_wagon("rocket_wagon_tender", {
 	collisionbox = {-1.0,-0.5,-1.0, 1.0,1.5,1.0},
 	drops={"default:steelblock 4"},
 	has_inventory = true,
-	get_inventory_formspec = function(self)
-		return "size[8,11]"..
-			"list[detached:advtrains_wgn_"..self.unique_id..";box;0,0;8,6;]"..
-			"list[current_player;main;0,7;8,4;]"..
-			"listring[]"
-	end,
+	get_inventory_formspec = advtrains.standard_inventory_formspec,
 	inventory_list_sizes = {
 		box=8*2,
 	},
@@ -106,12 +101,7 @@ advtrains.register_wagon("rocket_wagon_box", {
 	collisionbox = {-1.0,-0.5,-1.0, 1.0,1.5,1.0},
 	drops={"default:steelblock 4"},
 	has_inventory = true,
-	get_inventory_formspec = function(self)
-		return "size[8,11]"..
-			"list[detached:advtrains_wgn_"..self.unique_id..";box;0,0;8,6;]"..
-			"list[current_player;main;0,7;8,4;]"..
-			"listring[]"
-	end,
+	get_inventory_formspec = advtrains.standard_inventory_formspec,
 	inventory_list_sizes = {
 		box=8*6,
 	},
@@ -120,7 +110,7 @@ advtrains.register_wagon("rocket_wagon_box", {
 
 --craftings for train
 
-core.register_craft({
+minetest.register_craft({
 	output = 'advtrains:rocket',
 	recipe = {
 		{'advtrains:chimney', '', ''},
@@ -129,7 +119,7 @@ core.register_craft({
 	},
 })
 
-core.register_craft({
+minetest.register_craft({
 	output = 'advtrains:rocket_wagon_tender',
 	recipe = {
 		{'', '', 'advtrains_train_rocket:barrel'},
@@ -138,7 +128,7 @@ core.register_craft({
 	},
 })
 
-core.register_craft({
+minetest.register_craft({
 	output = 'advtrains:rocket_wagon_tender',
 	recipe = {
 		{'advtrains_train_rocket:barrel_stack', 'advtrains_train_rocket:barrel_stack', 'advtrains_train_rocket:barrel_stack'},
@@ -161,7 +151,7 @@ local barrel_formspec =
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
 
-core.register_node("advtrains_train_rocket:barrel", {
+minetest.register_node("advtrains_train_rocket:barrel", {
 	description = "barrel",
 	tiles = {"advtrains_rocket_wagon.png"},
 	groups = {choppy = 3, oddly_breakable_by_hand = 3, flammable = 3,},
@@ -173,41 +163,41 @@ core.register_node("advtrains_train_rocket:barrel", {
     sounds = default.node_sound_wood_defaults(),
           
     on_construct = function(pos)
-		local meta = core.get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", barrel_formspec)
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*1)
 	end,
 	can_dig = function(pos,player)
-		local meta = core.get_meta(pos);
+		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
 		return inv:is_empty("main")
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index,
 			to_list, to_index, count, player)
-		core.log("action", player:get_player_name() ..
-			" moves stuff in chest at " .. core.pos_to_string(pos))
+		minetest.log("action", player:get_player_name() ..
+			" moves stuff in chest at " .. minetest.pos_to_string(pos))
 	end,
     on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		core.log("action", player:get_player_name() ..
+		minetest.log("action", player:get_player_name() ..
 			" moves " .. stack:get_name() ..
-			" to chest at " .. core.pos_to_string(pos))
+			" to chest at " .. minetest.pos_to_string(pos))
 	end,
     on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		core.log("action", player:get_player_name() ..
+		minetest.log("action", player:get_player_name() ..
 			" takes " .. stack:get_name() ..
-			" from chest at " .. core.pos_to_string(pos))
+			" from chest at " .. minetest.pos_to_string(pos))
 	end,
 	on_blast = function(pos)
 		local drops = {}
 		default.get_inventory_drops(pos, "main", drops)
 		drops[#drops+1] = "advtrains_train_rocket:barrel"
-		core.remove_node(pos)
+		minetest.remove_node(pos)
 		return drops
 	end,
 })
 
-core.register_node("advtrains_train_rocket:barrel_stack", {
+minetest.register_node("advtrains_train_rocket:barrel_stack", {
 	description = "stacked barrel",
 	tiles = {"advtrains_rocket_wagon.png"},
 	groups = {choppy = 3, oddly_breakable_by_hand = 3, flammable = 3,},
@@ -231,42 +221,42 @@ core.register_node("advtrains_train_rocket:barrel_stack", {
     },
           
     on_construct = function(pos)
-		local meta = core.get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec", barrel_formspec)
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*3)
 	end,
 	can_dig = function(pos,player)
-		local meta = core.get_meta(pos);
+		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
 		return inv:is_empty("main")
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index,
 			to_list, to_index, count, player)
-		core.log("action", player:get_player_name() ..
-			" moves stuff in chest at " .. core.pos_to_string(pos))
+		minetest.log("action", player:get_player_name() ..
+			" moves stuff in chest at " .. minetest.pos_to_string(pos))
 	end,
     on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		core.log("action", player:get_player_name() ..
+		minetest.log("action", player:get_player_name() ..
 			" moves " .. stack:get_name() ..
-			" to chest at " .. core.pos_to_string(pos))
+			" to chest at " .. minetest.pos_to_string(pos))
 	end,
     on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		core.log("action", player:get_player_name() ..
+		minetest.log("action", player:get_player_name() ..
 			" takes " .. stack:get_name() ..
-			" from chest at " .. core.pos_to_string(pos))
+			" from chest at " .. minetest.pos_to_string(pos))
 	end,
 	on_blast = function(pos)
 		local drops = {}
 		default.get_inventory_drops(pos, "main", drops)
 		drops[#drops+1] = "advtrains_train_rocket:barrel_stack"
-		core.remove_node(pos)
+		minetest.remove_node(pos)
 		return drops
 	end,
 })
 
 --craftings for barrels
-core.register_craft({
+minetest.register_craft({
 	output = 'advtrains_train_rocket:barrel',
 	recipe = {
 		{'group:wood', 'group:wood', 'group:wood'},
@@ -274,7 +264,7 @@ core.register_craft({
 		{'group:wood', 'group:wood', 'group:wood'},
 	},
 })
-core.register_craft({
+minetest.register_craft({
 	output = 'advtrains_train_rocket:barrel_stack',
 	recipe = {
 		{'', 'advtrains_train_rocket:barrel', ''},
