@@ -132,7 +132,7 @@ core.register_craft({
 core.register_craft({
 	output = 'advtrains:rocket_wagon_tender',
 	recipe = {
-		{'', '', 'advtrains_train_rocket:barrel'},
+		{'', '', 'advtrains_train_rocket:barrel_stack'},
 		{'group:wood', 'group:wood', 'group:wood'},
 		{'advtrains:wheel', '', 'advtrains:wheel'},
 	},
@@ -141,7 +141,7 @@ core.register_craft({
 core.register_craft({
 	output = 'advtrains:rocket_wagon_tender',
 	recipe = {
-		{'advtrains_train_rocket:barrel_stack', 'advtrains_train_rocket:barrel_stack', 'advtrains_train_rocket:barrel_stack'},
+		{'advtrains_train_rocket:barrel', 'advtrains_train_rocket:barrel', 'advtrains_train_rocket:barrel'},
 		{'group:wood', 'group:wood', 'group:wood'},
 		{'advtrains:wheel', '', 'advtrains:wheel'},
 	},
