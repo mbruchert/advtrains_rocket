@@ -16,13 +16,13 @@ advtrains.register_wagon("rocket", {
 			name=S("Driver Stand"),
 			attach_offset={x=0, y=10, z=-10},
 			view_offset={x=0, y=6, z=0},
-			driving_ctrl_access=true,
 			group = "dstand",
 		},
 	},
 	seat_groups = {
 		dstand={
 			name = "Driver Stand",
+			driving_ctrl_access = true,
 			access_to = {},
 		},
 	},
